@@ -65,8 +65,22 @@ yields a Duration. A range between Times of different hierarchy (e.g.
 
 `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
 `main`. In the repo settings, set **Pages → Build and deployment → Source** to
-**GitHub Actions**. The Vite `base` defaults to `/time-calculator/`; override it with
-the `BASE_PATH` env var for a custom domain or user/org page.
+**GitHub Actions**.
+
+The Vite `base` is `./` (relative), so built asset URLs resolve at any path — a
+project site (`/<repo>/`), a user/org site (`/`), or a custom domain — with no
+configuration. Override with `BASE_PATH` only if you need an absolute base.
+
+### SEO files
+
+The build also emits `sitemap.xml` and `robots.txt` into `dist/` (via
+[`vite-plugin-sitemap`](https://www.npmjs.com/package/vite-plugin-sitemap)), so they
+deploy alongside the site. These need the site's **absolute** URL, which defaults to
+`https://freshmag.github.io/calcron/`; set the `SITE_URL` env var when building for a
+different repo, user/org page, or custom domain. Note that for a *project* Pages site,
+crawlers only read `robots.txt` from the domain root (`https://<user>.github.io/robots.txt`,
+owned by your `<user>.github.io` repo), so submit `sitemap.xml` directly via Google
+Search Console.
 
 ## Releases
 
