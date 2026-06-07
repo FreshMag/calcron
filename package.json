@@ -1,6 +1,6 @@
 {
   "name": "calcron",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Calcron — a tiny DSL for calculating with times and durations, in a dark-mode IDE.",
   "type": "module",

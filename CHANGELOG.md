@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/FreshMag/calcron/compare/v1.0.0...v1.1.0) (2026-06-07)
+
+
+### Features
+
+* implemented doubles, added settings and natural language output ([e7f1c6b](https://github.com/FreshMag/calcron/commit/e7f1c6b7e914d5874e34bed7ad0e24c4e2b2f38b))
+
 # 1.0.0 (2026-06-07)
 
 
