@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calcron — time & duration calculator</title>
+    <meta
+      name="description"
+      content="Calcron: a tiny DSL for calculating with times and durations, in a dark-mode IDE."
+    />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱️</text></svg>" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark">⏱</span>
+          <span class="brand-name">Calcron</span>
+          <span class="brand-tag">time &amp; duration calculator</span>
+        </div>
+        <a
+          class="repo-link"
+          href="https://github.com"
+          target="_blank"
+          rel="noreferrer noopener"
+          title="View source"
+          >source</a
+        >
+      </header>
+      <main class="editor-shell">
+        <div id="editor" class="editor"></div>
+      </main>
+      <footer class="app-footer">
+        <span id="status" class="status">ready</span>
+        <span class="hint">
+          Write one expression per line. Try <code>15:06 + 31m</code> or
+          <code>(00:15s..00:45s) / 2</code>.
+        </span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

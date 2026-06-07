@@ -1,0 +1,27 @@
+{
+  "name": "calcron",
+  "version": "1.0.0",
+  "description": "Calcron — a tiny DSL for calculating with times and durations, in a dark-mode IDE.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.6.0",
+    "@codemirror/language": "^6.10.2",
+    "@codemirror/lint": "^6.8.1",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.28.0",
+    "@lezer/highlight": "^1.2.0",
+    "codemirror": "^6.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vite": "^5.3.0",
+    "vitest": "^2.0.0"
+  }
+}
