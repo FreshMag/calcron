@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# semantic-release needs to push the changelog/version commit and tag, and to
+# create the GitHub Release (and comment on related issues/PRs).
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+# Don't run overlapping releases.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so commit analysis can find the last tag
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

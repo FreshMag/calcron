@@ -68,6 +68,34 @@ yields a Duration. A range between Times of different hierarchy (e.g.
 **GitHub Actions**. The Vite `base` defaults to `/time-calculator/`; override it with
 the `BASE_PATH` env var for a custom domain or user/org page.
 
+## Releases
+
+Releases are automated with [semantic-release](https://semantic-release.gitbook.io/).
+On every push to `main`, `.github/workflows/release.yml` analyses the commit
+messages and, when warranted, bumps the version, updates `CHANGELOG.md`, tags the
+commit, and publishes a GitHub Release. Configuration lives in `.releaserc.json`.
+
+Versioning is driven by [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Commit type             | Release       |
+| ----------------------- | ------------- |
+| `fix: …`                | patch (x.y.**z**) |
+| `feat: …`               | minor (x.**y**.z) |
+| `feat!: …` / `BREAKING CHANGE:` | major (**x**.y.z) |
+| `chore:`, `docs:`, `refactor:`, … | no release |
+
+Notes:
+
+- The first release needs a releasable commit — a `chore:` commit alone won't
+  trigger one. Land a `feat:` or `fix:` to cut `1.0.0`.
+- The package is `"private": true` and never published to npm; `@semantic-release/npm`
+  only keeps the version in `package.json` in sync (`npmPublish: false`).
+- The workflow uses the built-in `GITHUB_TOKEN`. Ensure **Settings → Actions →
+  General → Workflow permissions** allows read/write. If `main` has branch protection
+  that blocks the bot from pushing the `chore(release): … [skip ci]` commit, allow the
+  Actions bot to bypass it (or drop `@semantic-release/git` from `.releaserc.json` to
+  release with tags + GitHub Releases only, without committing the changelog back).
+
 ## Notes & assumptions
 
 - Weeks are accepted on input (1w = 7 days) and shown in days.
