@@ -55,11 +55,26 @@ A **Duration** is an elapsed amount — units are always explicit (no inference)
 31m + 40s              = 31m40s       duration + duration -> duration
 (00:15s..00:45s) / 2   = 15s          duration / scalar -> duration
 0/1M..0/2M * 5         = 5M           duration * scalar -> duration
+2 / 3                  = 0.6667       plain number math (scalars may be decimals)
 ```
 
 If any operand is a Time the result is a Time, except Time − Time (and `..`), which
 yields a Duration. A range between Times of different hierarchy (e.g.
 `(2000-06-03)..(15:07)`) raises an `IncompatibleHierarchyError`.
+
+Scalars can be integers or decimals (`1.5`, `0.5`) and you can do plain arithmetic
+between numbers. Note `/` is a date separator when unspaced (`2/3` = Feb 3rd) but
+division when spaced (`2 / 3` = 0.6667), per the usual literal rules.
+
+### Settings
+
+The gear icon (top-right) opens a settings popover, saved in the browser
+(`localStorage`, no backend):
+
+- **Output format** — *Natural language* (default, e.g. `2 hours and 43 minutes`,
+  `July 10`) or *Compact* (`2h43m`, `07/10`).
+- **Output language** — the locale used for natural output (month names, unit words,
+  number formatting), powered by the platform `Intl` APIs.
 
 ## Deployment
 
