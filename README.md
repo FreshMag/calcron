@@ -66,6 +66,30 @@ Scalars can be integers or decimals (`1.5`, `0.5`) and you can do plain arithmet
 between numbers. Note `/` is a date separator when unspaced (`2/3` = Feb 3rd) but
 division when spaced (`2 / 3` = 0.6667), per the usual literal rules.
 
+### Properties & methods (the `.` operator)
+
+Times and Durations support a `.` member operator, GPL-style.
+
+**Properties** re-express / read a single unit. Unit names accept aliases
+(`.seconds` == `.sec` == `.s`; `.minutes` == `.min` == `.m`; `m`=minute, `M`=month):
+
+```
+2m.seconds      = 120 seconds     // a duration in one unit
+90s.minutes     = 1.5 minutes
+15:06:50.s      = 50              // on a Time, reads that field's value
+```
+
+**Methods / functions** are functions whose receiver is the first argument — call
+either way:
+
+```
+trunc(1m30s, s)     = 1m30s       // trunc(TIME|DURATION, UNIT): truncate to a unit
+1m30s.trunc(s)      = 1m30s       // identical, method form
+trunc(15:06:50, m)  = 15:06       // drops finer fields
+```
+
+(User-defined functions are not supported.)
+
 ### Settings
 
 The gear icon (top-right) opens a settings popover, saved in the browser
