@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/FreshMag/calcron/compare/v1.1.0...v1.2.0) (2026-06-07)
+
+
+### Features
+
+* implemented methods and properties. Implemented trunc function ([9a9bdd2](https://github.com/FreshMag/calcron/commit/9a9bdd279b54cb1ce603b9f9b1a1eed28cb3a85b))
+
 # [1.1.0](https://github.com/FreshMag/calcron/compare/v1.0.0...v1.1.0) (2026-06-07)
 
 
