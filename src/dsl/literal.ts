@@ -19,7 +19,7 @@ import { makeTime } from "./time";
 
 const DURATION_RE = /^(?:\s*\d+\s*(?:us|ms|s|m|h|d|w|M|y)\s*)+$/;
 const DURATION_PART_RE = /(\d+)\s*(us|ms|s|m|h|d|w|M|y)/g;
-const INT_RE = /^\d+$/;
+const NUMBER_RE = /^\d+(?:\.\d+)?$/; // integer or decimal scalar
 const TERM_RE = /^(\d+)([a-zA-Z]+)?$/;
 
 /** Specifier suffix → TIME_FIELDS field (week is rejected — not a Time position). */
@@ -38,7 +38,7 @@ export function parseLiteral(raw: string, pos: number, end: number): Value {
   const text = raw.trim();
   if (text === "") throw new ParseError("Empty literal", pos, end);
 
-  if (INT_RE.test(text)) {
+  if (NUMBER_RE.test(text)) {
     return { kind: "num", value: Number(text) } as Num;
   }
 

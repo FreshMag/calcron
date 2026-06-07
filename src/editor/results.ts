@@ -2,6 +2,7 @@
 // at the end of each line, plus a linter source that underlines errors.
 
 import { Diagnostic, linter } from "@codemirror/lint";
+import { StateEffect } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import {
   Decoration,
@@ -10,7 +11,11 @@ import {
   ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import { run } from "../dsl";
+import { formatValue, run } from "../dsl";
+import { getSettings } from "../settings";
+
+/** Dispatched when user settings change, to force the result widgets to re-render. */
+export const settingsChanged = StateEffect.define<void>();
 
 class ResultWidget extends WidgetType {
   constructor(
@@ -38,13 +43,15 @@ class ResultWidget extends WidgetType {
 
 function buildDecorations(view: EditorView): DecorationSet {
   const doc = view.state.doc;
+  const settings = getSettings();
   const results = run(doc.toString());
   const widgets = results.map((r) => {
     const line = doc.line(r.line + 1);
-    const widget = new ResultWidget(
-      r.ok ? r.text ?? "" : r.error ?? "error",
-      r.ok,
-    );
+    const text =
+      r.ok && r.value
+        ? formatValue(r.value, { format: settings.format, locale: settings.locale })
+        : r.error ?? "error";
+    const widget = new ResultWidget(text, r.ok);
     return Decoration.widget({ widget, side: 1 }).range(line.to);
   });
   return Decoration.set(widgets, true);
@@ -57,7 +64,10 @@ export const resultsPlugin = ViewPlugin.fromClass(
       this.decorations = buildDecorations(view);
     }
     update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged) {
+      const settingsTouched = update.transactions.some((tr) =>
+        tr.effects.some((e) => e.is(settingsChanged)),
+      );
+      if (update.docChanged || update.viewportChanged || settingsTouched) {
         this.decorations = buildDecorations(update.view);
       }
     }

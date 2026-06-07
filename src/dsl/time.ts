@@ -41,6 +41,11 @@ export function makeTime(values: Partial<Record<TimeField, number>>): Time {
 
 type Broken = Record<TimeField, number>;
 
+/** Fully resolve a Time to all 8 concrete fields (anchoring free/zero-filled). Public for formatting. */
+export function resolveTimeFields(t: Time): Record<TimeField, number> {
+  return canonicalize(t);
+}
+
 /** Fully resolve a Time to all 8 fields, anchoring free and zero-filled fields. */
 function canonicalize(t: Time): Broken {
   const out = {} as Broken;

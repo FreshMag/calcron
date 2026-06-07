@@ -1,5 +1,8 @@
 import "./style.css";
 import { createEditor } from "./editor/setup";
+import { settingsChanged } from "./editor/results";
+import { mountSettings } from "./editor/settings-ui";
+import { subscribeSettings } from "./settings";
 import { run } from "./dsl";
 
 const EXAMPLE = `// Calcron — a tiny DSL for times & durations.
@@ -17,6 +20,10 @@ const EXAMPLE = `// Calcron — a tiny DSL for times & durations.
 15:06..17:49
 (00:15s..00:45s) / 2
 0/1M..0/2M * 5
+
+// Plain number math (use spaces so '/' is division, not a date)
+2 / 3
+1.5 * 4
 
 // Try an error: incompatible hierarchies
 (2000-06-03)..(15:07)
@@ -42,3 +49,11 @@ function refreshStatus() {
 refreshStatus();
 view.dom.addEventListener("keyup", refreshStatus);
 view.dom.addEventListener("input", refreshStatus);
+
+// Settings: mount the gear panel and re-render results when they change.
+const settingsBtn = document.getElementById("settings-btn");
+if (settingsBtn) mountSettings(settingsBtn);
+subscribeSettings(() => {
+  view.dispatch({ effects: settingsChanged.of() });
+  refreshStatus();
+});

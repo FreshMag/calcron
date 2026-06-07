@@ -90,6 +90,50 @@ describe("Specifier semantics", () => {
   });
 });
 
+describe("Scalars (doubles) and number arithmetic", () => {
+  it("parses decimal scalars", () => {
+    expect(fmt("2.5")).toBe("2.5");
+    expect(fmt("0.5")).toBe("0.5");
+  });
+
+  it("evaluates arithmetic between numbers", () => {
+    expect(fmt("2 * 3")).toBe("6");
+    expect(fmt("1.5 + 2")).toBe("3.5");
+    expect(fmt("10 - 4.5")).toBe("5.5");
+    expect(Number(fmt("2 / 3"))).toBeCloseTo(0.6666666, 5);
+  });
+
+  it("scales durations by a double", () => {
+    expect(fmt("30s * 1.5")).toBe("45s");
+    expect(fmt("1m / 2.5")).toBe("24s");
+  });
+
+  it("rejects division by zero", () => {
+    expect(() => evalLine("1 / 0")).toThrow();
+  });
+});
+
+describe("Natural-language formatting", () => {
+  const nat = (src: string, locale: string) =>
+    formatValue(evalLine(src), { format: "natural", locale });
+
+  it("renders durations in English and Italian", () => {
+    expect(nat("15:06..17:49", "en")).toBe("2 hours and 43 minutes");
+    expect(nat("15:06..17:49", "it")).toBe("2 ore e 43 minuti");
+    expect(nat("31m + 40s", "en")).toBe("31 minutes and 40 seconds");
+  });
+
+  it("renders dates with localized month names", () => {
+    expect(nat("06/20 + 20d", "en")).toBe("July 10");
+    expect(nat("06/20 + 20d", "it")).toBe("10 luglio");
+  });
+
+  it("renders scalars with the locale's number format", () => {
+    expect(nat("3 / 2", "en")).toBe("1.5");
+    expect(nat("3 / 2", "it")).toBe("1,5");
+  });
+});
+
 describe("run() program evaluation", () => {
   it("ignores comments and blank lines, reports per line", () => {
     const results = run(`15:06 + 31m  // add half an hour\n\n31m + 40s`);

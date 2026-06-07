@@ -114,10 +114,21 @@ export function tokenize(src: string): Token[] {
     if (ATOM_START.test(c)) {
       const start = i;
       let buf = "";
-      while (i < n && ATOM_BODY.test(src[i])) {
-        // Stop before a range operator so `00:15s..00:45s` splits correctly.
-        if (src[i] === "." ) break;
-        buf += src[i];
+      while (i < n) {
+        const d = src[i];
+        if (d === ".") {
+          // `..` is the range operator; a single `.` before a digit is a
+          // decimal point (e.g. `2.5`); any other `.` ends the atom.
+          if (src[i + 1] === ".") break;
+          if (/[0-9]/.test(src[i + 1] ?? "")) {
+            buf += d;
+            i++;
+            continue;
+          }
+          break;
+        }
+        if (!ATOM_BODY.test(d)) break;
+        buf += d;
         i++;
       }
       push("atom", buf, start, i);

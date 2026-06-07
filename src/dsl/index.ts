@@ -9,6 +9,7 @@ export * from "./types";
 export { parse } from "./parser";
 export { evaluate } from "./evaluator";
 export { formatValue } from "./format";
+export type { FormatOptions, OutputFormat } from "./format";
 
 export interface LineResult {
   line: number; // 0-based line index in the program
