@@ -4,7 +4,7 @@
 // (and the `..` range) which yields a Duration.
 
 import { Node } from "./parser";
-import { Value, TypeError_ } from "./types";
+import { ParseError, Value, TypeError_ } from "./types";
 import {
   addDurations,
   divideDuration,
@@ -12,6 +12,8 @@ import {
   subDurations,
 } from "./duration";
 import { addDurationToTime, diffTimes } from "./time";
+import { resolveUnit } from "./units";
+import { accessUnit, callBuiltin } from "./builtins";
 
 const num = (value: number): Value => ({ kind: "num", value });
 
@@ -19,6 +21,31 @@ export function evaluate(node: Node): Value {
   switch (node.type) {
     case "literal":
       return node.value;
+
+    case "ident": {
+      const unit = resolveUnit(node.name);
+      if (unit === null) {
+        throw new ParseError(`Unknown identifier '${node.name}'`, node.pos, node.end);
+      }
+      return { kind: "unit", unit };
+    }
+
+    case "call":
+      return callBuiltin(node.name, node.args.map(evaluate));
+
+    case "member": {
+      const object = evaluate(node.object);
+      if (node.args) {
+        // Method call: receiver is passed as the first argument.
+        return callBuiltin(node.name, [object, ...node.args.map(evaluate)]);
+      }
+      // Property access: the name must be a unit alias.
+      const unit = resolveUnit(node.name);
+      if (unit === null) {
+        throw new ParseError(`Unknown property '.${node.name}'`, node.pos, node.end);
+      }
+      return accessUnit(object, unit, node.name);
+    }
 
     case "range": {
       const a = evaluate(node.left);

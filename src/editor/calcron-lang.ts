@@ -8,7 +8,7 @@ import {
 } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 
-const UNIT_RE = /^(us|ms|s|m|h|d|w|M|y)\b/;
+const IDENT_RE = /^[A-Za-z]+/;
 
 const calcronStream = StreamLanguage.define<{ inComment: boolean }>({
   startState: () => ({ inComment: false }),
@@ -31,26 +31,27 @@ const calcronStream = StreamLanguage.define<{ inComment: boolean }>({
       return "string";
     }
 
-    // Range / arithmetic operators.
+    // Range / arithmetic / member operators.
     if (stream.match("..")) return "operator";
-    if (stream.match(/^[+\-*/]/)) return "operator";
+    if (stream.match(/^[+\-*/.]/)) return "operator";
 
     if (ch === "(" || ch === ")") {
       stream.next();
       return "bracket";
     }
 
-    // Numbers (with optional trailing unit for durations).
+    // Numbers (with an optional decimal part).
     if (/\d/.test(ch ?? "")) {
       stream.eatWhile(/\d/);
+      stream.match(/^\.\d+/);
       return "number";
     }
 
-    // Bare unit / specifier letters.
-    if (stream.match(UNIT_RE)) return "unit";
+    // Identifiers: units, specifiers, property/method/function names.
+    if (stream.match(IDENT_RE)) return "unit";
 
-    // Separators that join literal terms.
-    if (ch === ":") {
+    // Separators that join literal terms / arguments.
+    if (ch === ":" || ch === ",") {
       stream.next();
       return "separator";
     }

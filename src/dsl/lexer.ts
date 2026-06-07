@@ -18,6 +18,8 @@ export type TokenType =
   | "star"
   | "slash"
   | "range" // ..
+  | "dot" // . (member access)
+  | "comma" // , (argument separator)
   | "lparen"
   | "rparen";
 
@@ -63,14 +65,24 @@ export function tokenize(src: string): Token[] {
       continue;
     }
 
-    // Range operator `..` (two dots). A lone `.` is not valid syntax.
+    // Range operator `..` (two dots) vs. member access `.` (single dot).
+    // A decimal point is absorbed during atom scanning, so any `.` reaching
+    // here is one of these two operators.
     if (c === "." && src[i + 1] === ".") {
       push("range", "..", i, i + 2);
       i += 2;
       continue;
     }
     if (c === ".") {
-      throw new ParseError("Unexpected '.' (did you mean '..'?)", i, i + 1);
+      push("dot", ".", i, i + 1);
+      i++;
+      continue;
+    }
+
+    if (c === ",") {
+      push("comma", ",", i, i + 1);
+      i++;
+      continue;
     }
 
     if (c === "'" || c === '"') {

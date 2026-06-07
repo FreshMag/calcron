@@ -3,9 +3,17 @@
 // (3:37 PM, "31 minutes and 40 seconds", "July 10"). Natural formatting leans on
 // the platform Intl APIs for correct pluralization, joining, and month names.
 
-import { DurationParts, durationParts } from "./duration";
+import { DurationParts, durationParts, totalInUnit } from "./duration";
 import { resolveTimeFields } from "./time";
-import { Duration, TIME_FIELDS, Time, TimeField, Value, fieldIndex } from "./types";
+import {
+  Duration,
+  DurationUnit,
+  TIME_FIELDS,
+  Time,
+  TimeField,
+  Value,
+  fieldIndex,
+} from "./types";
 
 export type OutputFormat = "natural" | "compact";
 
@@ -25,7 +33,39 @@ export function formatValue(v: Value, opts: FormatOptions = DEFAULT_OPTS): strin
       return natural ? naturalTime(v, opts.locale) : compactTime(v);
     case "duration":
       return natural ? naturalDuration(v, opts.locale) : compactDuration(v);
+    case "unit":
+      return v.unit;
   }
+}
+
+// Map a duration unit to a sanctioned Intl unit (microsecond has none → null).
+const INTL_DURATION_UNIT: Record<DurationUnit, string | null> = {
+  us: null,
+  ms: "millisecond",
+  s: "second",
+  m: "minute",
+  h: "hour",
+  d: "day",
+  w: "week",
+  M: "month",
+  y: "year",
+};
+
+function naturalQuantity(value: number, unit: DurationUnit, locale: string): string {
+  const intl = INTL_DURATION_UNIT[unit];
+  if (intl) {
+    return new Intl.NumberFormat(locale, {
+      style: "unit",
+      unit: intl,
+      unitDisplay: "long",
+      maximumFractionDigits: 8,
+    }).format(value);
+  }
+  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 8 }).format(value)} µs`;
+}
+
+function compactQuantity(value: number, unit: DurationUnit): string {
+  return `${compactNumber(Number(value.toPrecision(12)))}${unit}`;
 }
 
 // --- Numbers ----------------------------------------------------------------
@@ -81,6 +121,7 @@ function compactTime(v: Time): string {
 }
 
 function compactDuration(v: Duration): string {
+  if (v.displayUnit) return compactQuantity(totalInUnit(v, v.displayUnit), v.displayUnit);
   const p = durationParts(v);
   const out = compactOrder(p)
     .filter(([n]) => n !== 0)
@@ -130,6 +171,7 @@ function unitText(value: number, field: TimeField, locale: string): string {
 }
 
 function naturalDuration(v: Duration, locale: string): string {
+  if (v.displayUnit) return naturalQuantity(totalInUnit(v, v.displayUnit), v.displayUnit, locale);
   const p = durationParts(v);
   const negative = v.months < 0 || (v.months === 0 && v.fixedUs < 0);
   const order: [number, TimeField][] = [

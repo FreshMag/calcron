@@ -98,3 +98,18 @@ export function durationParts(d: Duration): DurationParts {
 export function isZeroDuration(d: Duration): boolean {
   return d.months === 0 && d.fixedUs === 0;
 }
+
+/** Truncate a duration toward zero at the given unit (drop everything finer). */
+export function truncDuration(d: Duration, unit: DurationUnit): Duration {
+  if (unit === "y") return makeDuration(Math.trunc(d.months / 12) * 12, 0);
+  if (unit === "M") return makeDuration(d.months, 0);
+  const step = FIXED_US[unit];
+  return makeDuration(d.months, Math.trunc(d.fixedUs / step) * step);
+}
+
+/** Express the whole duration as a single (possibly fractional) count of `unit`. */
+export function totalInUnit(d: Duration, unit: DurationUnit): number {
+  if (unit === "y") return d.months / 12;
+  if (unit === "M") return d.months;
+  return d.fixedUs / FIXED_US[unit];
+}

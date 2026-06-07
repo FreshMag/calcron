@@ -25,6 +25,11 @@ const EXAMPLE = `// Calcron — a tiny DSL for times & durations.
 2 / 3
 1.5 * 4
 
+// Properties (.seconds == .s) and methods / functions (trunc)
+2m.seconds
+1m30s.trunc(s)
+trunc(15:06:50, m)
+
 // Try an error: incompatible hierarchies
 (2000-06-03)..(15:07)
 `;

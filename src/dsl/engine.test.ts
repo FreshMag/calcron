@@ -134,6 +134,46 @@ describe("Natural-language formatting", () => {
   });
 });
 
+describe("Member operator: properties and methods", () => {
+  const nat = (src: string, locale: string) =>
+    formatValue(evalLine(src), { format: "natural", locale });
+
+  it("converts a duration to a single unit via property", () => {
+    expect(fmt("2m.seconds")).toBe("120s");
+    expect(nat("2m.seconds", "en")).toBe("120 seconds");
+    expect(fmt("2m.s")).toBe("120s"); // alias
+    expect(fmt("90s.minutes")).toBe("1.5m");
+    expect(nat("90s.minutes", "en")).toBe("1.5 minutes");
+  });
+
+  it("reads a Time field via property", () => {
+    expect(fmt("15:06:50.seconds")).toBe("50");
+    expect(fmt("15:06:50.h")).toBe("15");
+  });
+
+  it("rejects cross-group unit conversion", () => {
+    expect(() => evalLine("1M.seconds")).toThrow();
+  });
+
+  it("truncates durations as function and as method", () => {
+    expect(fmt("trunc(1m30s, s)")).toBe("1m30s");
+    expect(fmt("1m30s.trunc(s)")).toBe("1m30s");
+    expect(fmt("trunc(1m30s, m)")).toBe("1m");
+    expect(fmt("1m90s.trunc(m)")).toBe("2m");
+  });
+
+  it("truncates times as function and as method", () => {
+    expect(fmt("trunc(15:06:50, m)")).toBe("15:06");
+    expect(fmt("15:06:50.trunc(m)")).toBe("15:06");
+    expect(fmt("2000/06/15 8:50.trunc(d)")).toBe("2000/06/15");
+  });
+
+  it("reports unknown functions and properties", () => {
+    expect(() => evalLine("1m30s.frobnicate(s)")).toThrow();
+    expect(() => evalLine("1m30s.bogus")).toThrow();
+  });
+});
+
 describe("run() program evaluation", () => {
   it("ignores comments and blank lines, reports per line", () => {
     const results = run(`15:06 + 31m  // add half an hour\n\n31m + 40s`);

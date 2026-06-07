@@ -148,3 +148,16 @@ export function diffTimes(end: Time, start: Time): Duration {
 function windowLabel(t: Time): string {
   return `${TIME_FIELDS[t.top]}..${TIME_FIELDS[t.bottom]}`;
 }
+
+/** Truncate a Time at the given field: drop (zero) every field finer than it. */
+export function truncTime(t: Time, field: TimeField): Time {
+  const idx = fieldIndex(field);
+  // Clamp into the window: finer than bottom = no-op; coarser than top = keep top only.
+  const newBottom = Math.min(t.bottom, Math.max(t.top, idx));
+  const values: Partial<Record<TimeField, number>> = {};
+  for (let i = t.top; i <= newBottom; i++) {
+    const f = TIME_FIELDS[i];
+    values[f] = t.values[f] ?? 0;
+  }
+  return { kind: "time", top: t.top, bottom: newBottom, values };
+}

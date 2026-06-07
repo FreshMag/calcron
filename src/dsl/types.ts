@@ -49,6 +49,8 @@ export interface Duration {
   kind: "duration";
   months: number;
   fixedUs: number;
+  /** When set (via `.unit` access), the whole duration is displayed in this single unit. */
+  displayUnit?: DurationUnit;
 }
 
 /** A bare scalar literal (only meaningful as a multiplier/divisor of a Duration). */
@@ -57,7 +59,13 @@ export interface Num {
   value: number;
 }
 
-export type Value = Time | Duration | Num;
+/** A unit reference (e.g. from `s` in `trunc(1m30s, s)`); a first-class value so identifiers can evaluate to it. */
+export interface UnitRef {
+  kind: "unit";
+  unit: DurationUnit;
+}
+
+export type Value = Time | Duration | Num | UnitRef;
 
 // --- Microsecond factors for the fixed-length cascade -----------------------
 
