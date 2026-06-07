@@ -28,9 +28,8 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-        env:
-          # Project Pages serve at /<repo>/. Override if you use a custom domain.
-          BASE_PATH: /time-calculator/
+        # No BASE_PATH: the build uses a relative base, which works at any
+        # Pages path (project site, user site, or custom domain).
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
